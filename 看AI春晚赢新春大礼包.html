@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>参与抽奖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            text-align: center;
+            /* 使用视窗相对单位 */
+            padding: 3vh 3vw;
+            background-image: url('./image/背景图片.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #f5f5f5;
+            color: #333;
+            text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2vh 2vw;
+            /* 添加玻璃拟态效果 */
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 3vh;
+        }
+
+        #lotteryButton {
+            padding: clamp(10px, 2vw, 20px) clamp(20px, 4vw, 40px);
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            background-color: #ff5252;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 2vh 0;
+        }
+
+        #lotteryButton:hover {
+            background-color: #ff1744;
+            transform: translateY(-2px);
+        }
+
+        #qrCode {
+            display: none;
+            width: 90%;
+            max-width: 400px;
+            margin: 3vh auto;
+            padding: 3vh 3vw;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        #qrCode img {
+            width: 80%;
+            max-width: 250px;
+            height: auto;
+            margin: 2vh auto;
+            display: block;
+        }
+
+        #qrCode p {
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            line-height: 1.5;
+            margin: 2vh 0;
+        }
+
+        #luckyCode {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            font-weight: bold;
+            color: #ff5252;
+            margin-top: 2vh;
+        }
+
+        /* 横屏适配 */
+        @media screen and (orientation: landscape) and (max-height: 500px) {
+            .container {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-around;
+                gap: 20px;
+            }
+
+            #qrCode {
+                margin: 0;
+            }
+
+            #qrCode img {
+                width: 60%;
+            }
+        }
+
+        /* 移动端竖屏适配 */
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 2vh 2vw;
+            }
+
+            .container {
+                width: 95%;
+                padding: 15px;
+            }
+
+            #qrCode {
+                width: 95%;
+                padding: 15px;
+            }
+        }
+
+        /* 添加轮盘样式 */
+        .lottery-wheel {
+            display: none;
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            background: conic-gradient(
+                from 0deg,
+                #ff5252 0deg 60deg,
+                #ffeb3b 60deg 120deg,
+                #4caf50 120deg 180deg,
+                #2196f3 180deg 240deg,
+                #9c27b0 240deg 300deg,
+                #ff9800 300deg 360deg
+            );
+            animation: spin 3s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .wheel::before {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(1800deg);
+            }
+        }
+
+        /* 转盘消失动画 */
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* 二维码出现动画 */
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: scale(0.8);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        #qrCode {
+            /* 修改原有的display:none */
+            display: none;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>欢迎参与抽奖活动</h1>
+        <button id="lotteryButton">参与抽奖</button>
+        
+        <!-- 添加轮盘元素 -->
+        <div class="lottery-wheel">
+            <div class="wheel"></div>
+        </div>
+
+        <div id="qrCode">
+            <img src="./image/二维码.jpg" alt="二维码" />
+            <p>请扫码关注珂淞聊AI预约AI春晚，关注后私信我发你幸运码，直播开始后凭码开奖哦！</p>
+            <p id="luckyCode"></p>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const lotteryButton = document.getElementById('lotteryButton');
+            const qrCode = document.getElementById('qrCode');
+            const luckyCode = document.getElementById('luckyCode');
+            const lotteryWheel = document.querySelector('.lottery-wheel');
+
+            lotteryButton.addEventListener('click', function() {
+                // 禁用按钮
+                lotteryButton.disabled = true;
+                lotteryButton.style.opacity = '0.6';
+                lotteryButton.innerText = '抽奖中...';
+
+                // 显示并开始转动轮盘
+                lotteryWheel.style.display = 'block';
+                
+                // 3.5秒后处理结果
+                setTimeout(() => {
+                    // 淡出轮盘
+                    lotteryWheel.style.animation = 'fadeOut 0.5s ease forwards';
+
+                    // 显示二维码
+                    setTimeout(() => {
+                        lotteryWheel.style.display = 'none';
+                        qrCode.style.display = 'block';
+                        
+                        // 平滑滚动到二维码区域
+                        qrCode.scrollIntoView({ behavior: 'smooth' });
+                        
+                        // 更新按钮状态
+                        lotteryButton.innerText = '已参与';
+                    }, 500);
+                }, 3500);
+            });
+        })();
+    </script>
+</body>
+</html>
