@@ -21,7 +21,7 @@
             text-align: center;
             /* 使用视窗相对单位 */
             padding: 3vh 3vw;
-            background-image: url('./image/背景图片.png');
+            background-image: url('./image/背景图片2.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -211,6 +211,50 @@
             opacity: 0;
             animation: fadeIn 0.5s ease forwards;
         }
+
+        .prize-info {
+            margin: 20px auto;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+        }
+
+        .prize-info h3 {
+            color: #ff5252;
+            margin-bottom: 10px;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+        }
+
+        .prize-info ul {
+            list-style: none;
+            text-align: left;
+            padding: 0 20px;
+        }
+
+        .prize-info li {
+            margin: 8px 0;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: #333;
+        }
+
+        .reset-button {
+            margin-top: 20px;
+            padding: 8px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            transition: all 0.3s ease;
+        }
+
+        .reset-button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -218,15 +262,24 @@
         <h1>欢迎参与抽奖活动</h1>
         <button id="lotteryButton">参与抽奖</button>
         
-        <!-- 添加轮盘元素 -->
+        <div class="prize-info">
+            <h3>奖品价值</h3>
+            <ul>
+                <li>一等奖：价值500元奖品</li>
+                <li>二等奖：价值200元奖品</li>
+                <li>三等奖：价值100元奖品</li>
+            </ul>
+        </div>
+        
         <div class="lottery-wheel">
             <div class="wheel"></div>
         </div>
 
         <div id="qrCode">
             <img src="./image/二维码.jpg" alt="二维码" />
-            <p>请扫码关注珂淞聊AI预约AI春晚，关注后私信我发你幸运码，直播开始后凭码开奖哦！</p>
+            <p>请扫码关注珂淞聊AI预约AI春晚，后发你幸运码，凭码开奖哦！</p>
             <p id="luckyCode"></p>
+            <button class="reset-button" id="resetButton">返回首页</button>
         </div>
     </div>
 
@@ -236,12 +289,33 @@
             const qrCode = document.getElementById('qrCode');
             const luckyCode = document.getElementById('luckyCode');
             const lotteryWheel = document.querySelector('.lottery-wheel');
+            const prizeInfo = document.querySelector('.prize-info');
+            const resetButton = document.getElementById('resetButton');
+
+            function resetPage() {
+                // 重置所有状态
+                lotteryButton.disabled = false;
+                lotteryButton.style.opacity = '1';
+                lotteryButton.innerText = '参与抽奖';
+                qrCode.style.display = 'none';
+                lotteryWheel.style.display = 'none';
+                prizeInfo.style.display = 'block';
+                
+                // 平滑滚动到页面顶部
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
 
             lotteryButton.addEventListener('click', function() {
                 // 禁用按钮
                 lotteryButton.disabled = true;
                 lotteryButton.style.opacity = '0.6';
                 lotteryButton.innerText = '抽奖中...';
+
+                // 隐藏奖品信息
+                prizeInfo.style.display = 'none';
 
                 // 显示并开始转动轮盘
                 lotteryWheel.style.display = 'block';
@@ -264,6 +338,9 @@
                     }, 500);
                 }, 3500);
             });
+
+            // 添加重置按钮事件监听
+            resetButton.addEventListener('click', resetPage);
         })();
     </script>
 </body>
